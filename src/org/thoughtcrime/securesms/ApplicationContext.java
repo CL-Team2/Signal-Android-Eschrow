@@ -65,7 +65,7 @@ import dagger.ObjectGraph;
  * @author Moxie Marlinspike
  */
 
-// This is an initial test change. Delete as needed.
+// Thi IS THE REAL CHANGE
 public class ApplicationContext extends MultiDexApplication implements DependencyInjector {
 
   private static final String TAG = ApplicationContext.class.getName();
