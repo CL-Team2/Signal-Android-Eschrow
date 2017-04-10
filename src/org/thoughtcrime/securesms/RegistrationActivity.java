@@ -85,6 +85,7 @@ public class RegistrationActivity extends BaseActionBarActivity {
   }
 
   private void initializeResources() {
+    //the original intent is probably in MasterSecret.java but we don't really know
     this.masterSecret   = getIntent().getParcelableExtra("master_secret");
     this.countrySpinner        = (Spinner) findViewById(R.id.country_spinner);
     this.countryCode           = (TextView) findViewById(R.id.country_code);
@@ -95,6 +96,7 @@ public class RegistrationActivity extends BaseActionBarActivity {
     this.informationToggle     =            findViewById(R.id.information_link_container);
     this.informationToggleText = (TextView) findViewById(R.id.information_label);
 
+    //set colors
     DrawableCompat.setTint(this.createButton.getBackground(), getResources().getColor(R.color.signal_primary));
     DrawableCompat.setTint(this.skipButton.getBackground(), getResources().getColor(R.color.grey_400));
 
@@ -111,6 +113,7 @@ public class RegistrationActivity extends BaseActionBarActivity {
     }
   }
 
+  //drop down bar
   private void initializeSpinner() {
     this.countrySpinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
     this.countrySpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -141,6 +144,7 @@ public class RegistrationActivity extends BaseActionBarActivity {
     });
   }
 
+  //get phone numbers
   private void initializeNumber() {
     PhoneNumberUtil numberUtil  = PhoneNumberUtil.getInstance();
     String          localNumber = Util.getDeviceE164Number(this);
@@ -178,11 +182,13 @@ public class RegistrationActivity extends BaseActionBarActivity {
     else                    this.countryFormatter = util.getAsYouTypeFormatter(regionCode);
   }
 
+  //signals own configured number
   private String getConfiguredE164Number() {
     return PhoneNumberFormatter.formatE164(countryCode.getText().toString(),
                                            number.getText().toString());
   }
 
+  //checking to make sure everything in registration is filled out
   private class CreateButtonListener implements View.OnClickListener {
     @Override
     public void onClick(View v) {
@@ -226,6 +232,8 @@ public class RegistrationActivity extends BaseActionBarActivity {
       }
     }
 
+    //confirm everything entered is correct
+    //this is where the master secret is being passed
     private void promptForRegistrationStart(final Context context, final String e164number, final boolean gcmSupported) {
       AlertDialog.Builder dialog = new AlertDialog.Builder(context);
       dialog.setTitle(PhoneNumberFormatter.getInternationalFormatFromE164(e164number));

@@ -76,6 +76,7 @@ public class KeyCachingService extends Service {
 
   private static MasterSecret masterSecret;
 
+  //One-Time Pre-Key
   public KeyCachingService() {}
 
   public static synchronized @Nullable MasterSecret getMasterSecret(Context context) {

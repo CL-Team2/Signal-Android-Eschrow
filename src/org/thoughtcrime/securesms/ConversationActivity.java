@@ -1540,6 +1540,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
     new AsyncTask<OutgoingTextMessage, Void, Long>() {
       @Override
       protected Long doInBackground(OutgoingTextMessage... messages) {
+        //do something here
         return MessageSender.send(context, masterSecret, messages[0], threadId, forceSms);
       }
 

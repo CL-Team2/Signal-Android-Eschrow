@@ -106,6 +106,7 @@ public class ApplicationPreferencesActivity extends PassphraseRequiredActionBarA
     return true;
   }
 
+
   @Override
   public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
     if (key.equals(TextSecurePreferences.THEME_PREF)) {
@@ -115,6 +116,7 @@ public class ApplicationPreferencesActivity extends PassphraseRequiredActionBarA
       if (VERSION.SDK_INT >= 11) recreate();
       else                       dynamicLanguage.onResume(this);
 
+      //the KeyCachingService might be where the One-Time Pre-Key is stored
       Intent intent = new Intent(this, KeyCachingService.class);
       intent.setAction(KeyCachingService.LOCALE_CHANGE_EVENT);
       startService(intent);

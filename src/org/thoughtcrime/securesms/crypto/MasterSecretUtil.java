@@ -302,6 +302,7 @@ public class MasterSecretUtil {
       throws GeneralSecurityException
   {
     PBEKeySpec keyspec    = new PBEKeySpec(passphrase.toCharArray(), salt, iterations);
+    //key generated with SHA1 and AES128
     SecretKeyFactory skf  = SecretKeyFactory.getInstance("PBEWITHSHA1AND128BITAES-CBC-BC");
     return skf.generateSecret(keyspec);
   }
@@ -316,6 +317,7 @@ public class MasterSecretUtil {
     return cipher;
   }
 
+  //encrypt
   private static byte[] encryptWithPassphrase(byte[] encryptionSalt, int iterations, byte[] data, String passphrase)
       throws GeneralSecurityException
   {
@@ -323,6 +325,7 @@ public class MasterSecretUtil {
     return cipher.doFinal(data);
   }
 
+  //decrypt
   private static byte[] decryptWithPassphrase(byte[] encryptionSalt, int iterations, byte[] data, String passphrase)
       throws GeneralSecurityException, IOException
   {
