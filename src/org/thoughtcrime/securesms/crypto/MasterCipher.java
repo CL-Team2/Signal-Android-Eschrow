@@ -75,10 +75,14 @@ public class MasterCipher {
     return encryptBytes(privateKey.serialize());
   }
 
+  //Where encryption occurs
   public String encryptBody(@NonNull  String body)  {
+    //System.out.println("New Thing Here");
+    //System.out.println(body);
     return encryptAndEncodeBytes(body.getBytes());
   }
-	
+
+  //where decryption occurs
   public String decryptBody(String body) throws InvalidMessageException {
     return new String(decodeAndDecryptBytes(body));
   }
@@ -114,7 +118,7 @@ public class MasterCipher {
 		
       byte[] encryptedBody       = getEncryptedBody(cipher, body);
       byte[] encryptedAndMacBody = getMacBody(mac, encryptedBody);
-		
+
       return encryptedAndMacBody;
     } catch (GeneralSecurityException ge) {
       Log.w("bodycipher", ge);
@@ -216,7 +220,7 @@ public class MasterCipher {
   private Cipher getEncryptingCipher(SecretKeySpec key) throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException {
     //		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
     encryptingCipher.init(Cipher.ENCRYPT_MODE, key);
-		
+
     return encryptingCipher;
   }
 	
