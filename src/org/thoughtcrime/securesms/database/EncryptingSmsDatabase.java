@@ -54,6 +54,7 @@ public class EncryptingSmsDatabase extends SmsDatabase {
     return bodyCipher.encryptBody(body);
   }
 
+  //encrypting plaintext into ciphertext
   private String getEncryptedBody(MasterSecret masterSecret, String body) {
     MasterCipher bodyCipher = new MasterCipher(masterSecret);
     String ciphertext       = bodyCipher.encryptBody(body);

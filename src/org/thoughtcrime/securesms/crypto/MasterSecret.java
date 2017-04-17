@@ -71,6 +71,7 @@ public class MasterSecret implements Parcelable {
     this.macKey        = new SecretKeySpec(macKeyBytes, "HmacSHA1");
 
     // SecretKeySpec does an internal copy in its constructor.
+    // Think this is where Chain Key and Root Key are, because these seems to be 32 Bytes.
     Arrays.fill(encryptionKeyBytes, (byte) 0x00);
     Arrays.fill(macKeyBytes, (byte)0x00);
   }

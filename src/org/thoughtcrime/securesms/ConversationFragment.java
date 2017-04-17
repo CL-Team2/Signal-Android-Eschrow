@@ -101,6 +101,7 @@ public class ConversationFragment extends Fragment
   private View                        scrollToBottomButton;
   private TextView                    scrollDateHeader;
 
+  //this uses master secret
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);

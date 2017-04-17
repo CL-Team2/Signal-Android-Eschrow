@@ -170,6 +170,8 @@ import static org.whispersystems.signalservice.internal.push.SignalServiceProtos
  * @author Moxie Marlinspike
  *
  */
+//K - this is where single and group conversations are initiated, resetting a conversation, etc.
+
 public class ConversationActivity extends PassphraseRequiredActionBarActivity
     implements ConversationFragment.ConversationFragmentListener,
                AttachmentManager.AttachmentListener,
@@ -249,6 +251,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
     supportRequestWindowFeature(WindowCompat.FEATURE_ACTION_BAR_OVERLAY);
     setContentView(R.layout.conversation_activity);
 
+    //maybe this fragment is where the message key is initiated?
     fragment = initFragment(R.id.fragment_content, new ConversationFragment(),
                             masterSecret, dynamicLanguage.getCurrentLocale());
 
