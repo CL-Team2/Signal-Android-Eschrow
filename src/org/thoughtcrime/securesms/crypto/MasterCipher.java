@@ -75,10 +75,14 @@ public class MasterCipher {
     return encryptBytes(privateKey.serialize());
   }
 
+  //encryption of a string
   public String encryptBody(@NonNull  String body)  {
+    //System.out.println(body);
     return encryptAndEncodeBytes(body.getBytes());
+
   }
-	
+
+  //decryption of a string
   public String decryptBody(String body) throws InvalidMessageException {
     return new String(decodeAndDecryptBytes(body));
   }
