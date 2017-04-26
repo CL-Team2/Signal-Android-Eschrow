@@ -1,2 +1,2 @@
-include ':libsignal-service-java'
-include ':libsignal-protocol-java'
+include ':libs:libsignal-service-java'
+include ':libs:libsignal-protocol-java'
