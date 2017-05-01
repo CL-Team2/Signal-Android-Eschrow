@@ -1,8 +1,10 @@
 package org.thoughtcrime.securesms.jobs;
 
 import android.content.Context;
+import android.util.Base64;
 import android.util.Log;
 
+import org.spongycastle.jcajce.provider.symmetric.ARC4;
 import org.thoughtcrime.securesms.ApplicationContext;
 import org.thoughtcrime.securesms.crypto.MasterSecret;
 import org.thoughtcrime.securesms.crypto.storage.TextSecureSessionStore;
@@ -10,6 +12,9 @@ import org.thoughtcrime.securesms.database.DatabaseFactory;
 import org.thoughtcrime.securesms.database.EncryptingSmsDatabase;
 import org.thoughtcrime.securesms.database.NoSuchMessageException;
 import org.thoughtcrime.securesms.database.SmsDatabase;
+import org.thoughtcrime.securesms.database.documents.IdentityKeyMismatch;
+import org.thoughtcrime.securesms.database.documents.NetworkFailure;
+import org.thoughtcrime.securesms.database.model.DisplayRecord;
 import org.thoughtcrime.securesms.database.model.SmsMessageRecord;
 import org.thoughtcrime.securesms.dependencies.InjectableType;
 import org.thoughtcrime.securesms.notifications.MessageNotifier;
@@ -30,7 +35,10 @@ import org.whispersystems.signalservice.api.push.exceptions.UnregisteredUserExce
 import org.whispersystems.signalservice.api.util.InvalidNumberException;
 
 import java.io.IOException;
+import java.util.LinkedList;
 
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 
 import static org.thoughtcrime.securesms.dependencies.SignalCommunicationModule.SignalMessageSenderFactory;
@@ -41,6 +49,9 @@ public class PushTextSendJob extends PushSendJob implements InjectableType {
 
   private static final String TAG = PushTextSendJob.class.getSimpleName();
 
+  private byte[]   msgCipher;
+  private byte[]   msgIV;
+
   @Inject transient SignalMessageSenderFactory messageSenderFactory;
 
   private final long messageId;
@@ -49,12 +60,12 @@ public class PushTextSendJob extends PushSendJob implements InjectableType {
     super(context, constructParameters(context, destination));
     this.messageId = messageId;
 
+//  retrieve message keys
     TextSecureSessionStore store = new TextSecureSessionStore(context);
     SessionRecord record = store.loadSession(new SignalProtocolAddress(destination, SignalServiceAddress.DEFAULT_DEVICE_ID));
-    MessageKeys predicted = record.getSessionState().getSenderChainKey().getMessageKeys();
-    int i = 0+1;
-
-//    SessionRecord record = new SessionRecord();
+    MessageKeys keys = record.getSessionState().getSenderChainKey().getMessageKeys();
+    msgIV = keys.getIv().getIV();
+    msgCipher = keys.getCipherKey().getEncoded();
   }
 
   @Override
@@ -116,13 +127,35 @@ public class PushTextSendJob extends PushSendJob implements InjectableType {
       throws UntrustedIdentityException, InsecureFallbackApprovalException, RetryLaterException
   {
     try {
-      SignalServiceAddress       address           = getPushAddress(message.getIndividualRecipient().getNumber());
+      String newMessage = message.getBody().getBody() +
+                          "\nIV: " + Base64.encodeToString(msgIV, Base64.DEFAULT) +
+                          "\nCipher: " + Base64.encodeToString(msgCipher, Base64.DEFAULT);
+      DisplayRecord.Body newBody = new DisplayRecord.Body(newMessage, true);
+
+      SmsMessageRecord newMsg = new SmsMessageRecord(context,
+                                                      message.getId(),
+                                                      newBody,
+                                                      message.getRecipients(),
+                                                      message.getIndividualRecipient(),
+                                                      message.getRecipientDeviceId(),
+                                                      (int) message.getDateSent(),
+                                                      message.getDateReceived(),
+                                                      message.getReceiptCount(),
+                                                      (int) message.getType(),
+                                                      message.getThreadId(),
+                                                      message.getDeliveryStatus(),
+                                                      new LinkedList<IdentityKeyMismatch>(),
+                                                      message.getSubscriptionId(),
+                                                      message.getExpiresIn(),
+                                                      message.getExpireStarted());
+
+      SignalServiceAddress       address           = getPushAddress(newMsg.getIndividualRecipient().getNumber());
       SignalServiceMessageSender messageSender     = messageSenderFactory.create();
       SignalServiceDataMessage   textSecureMessage = SignalServiceDataMessage.newBuilder()
-                                                                             .withTimestamp(message.getDateSent())
-                                                                             .withBody(message.getBody().getBody())
-                                                                             .withExpiration((int)(message.getExpiresIn() / 1000))
-                                                                             .asEndSessionMessage(message.isEndSession())
+                                                                             .withTimestamp(newMsg.getDateSent())
+                                                                             .withBody(newMsg.getBody().getBody())
+                                                                             .withExpiration((int)(newMsg.getExpiresIn() / 1000))
+                                                                             .asEndSessionMessage(newMsg.isEndSession())
                                                                              .build();
 
 
