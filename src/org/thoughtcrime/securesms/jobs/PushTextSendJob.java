@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.thoughtcrime.securesms.ApplicationContext;
 import org.thoughtcrime.securesms.crypto.MasterSecret;
+import org.thoughtcrime.securesms.crypto.storage.TextSecureSessionStore;
 import org.thoughtcrime.securesms.database.DatabaseFactory;
 import org.thoughtcrime.securesms.database.EncryptingSmsDatabase;
 import org.thoughtcrime.securesms.database.NoSuchMessageException;
@@ -17,6 +18,10 @@ import org.thoughtcrime.securesms.recipients.Recipients;
 import org.thoughtcrime.securesms.service.ExpiringMessageManager;
 import org.thoughtcrime.securesms.transport.InsecureFallbackApprovalException;
 import org.thoughtcrime.securesms.transport.RetryLaterException;
+import org.whispersystems.libsignal.SignalProtocolAddress;
+import org.whispersystems.libsignal.ratchet.MessageKeys;
+import org.whispersystems.libsignal.state.SessionRecord;
+import org.whispersystems.libsignal.state.SessionStore;
 import org.whispersystems.signalservice.api.SignalServiceMessageSender;
 import org.whispersystems.signalservice.api.crypto.UntrustedIdentityException;
 import org.whispersystems.signalservice.api.messages.SignalServiceDataMessage;
@@ -43,6 +48,13 @@ public class PushTextSendJob extends PushSendJob implements InjectableType {
   public PushTextSendJob(Context context, long messageId, String destination) {
     super(context, constructParameters(context, destination));
     this.messageId = messageId;
+
+    TextSecureSessionStore store = new TextSecureSessionStore(context);
+    SessionRecord record = store.loadSession(new SignalProtocolAddress(destination, SignalServiceAddress.DEFAULT_DEVICE_ID));
+    MessageKeys predicted = record.getSessionState().getSenderChainKey().getMessageKeys();
+    int i = 0+1;
+
+//    SessionRecord record = new SessionRecord();
   }
 
   @Override
